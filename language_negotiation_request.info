@@ -1,0 +1,3 @@
+name = Language Negotiatie Request
+description = A language negotiation based only on the request, no session storage.
+core = 7.x

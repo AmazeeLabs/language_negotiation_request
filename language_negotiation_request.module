@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ *  A language negotiation based only on the request, no session storage.
+ */
+
+/**
+ * Implements hook_language_negotiation_info().
+ */
+function language_negotiation_request_language_negotiation_info() {
+  $providers['language-negotiation-request'] = array(
+    'callbacks' => array('language' => 'language_negotiation_request_get_language'),
+    'name' => t('Request'),
+    'description' => t('Determine the language from a request parameter.'),
+    'config' => 'admin/config/regional/language/configure/request',
+    'file' => drupal_get_path('module', 'language_negotiation_request') . '/language_negotiation_request.module',
+  );
+  return $providers;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function language_negotiation_request_menu() {
+  $items['admin/config/regional/language/configure/request'] = array(
+    'title' => 'Request language detection configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('langauge_negotiation_request_providers_request_form'),
+    'access arguments' => array('administer languages'),
+    'file' => 'langauge_negotiation_request.admin.inc',
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  return $items;
+}
+
+/**
+ * Identifiest the language from a request paramter.
+ */
+function language_negotiation_request_get_language($languages) {
+  $param = variable_get('language_negotiation_request_param', 'language');
+
+  // Request parameter: we need to update the session parameter only if we have
+  // an authenticated user.
+  if (isset($_GET[$param]) && isset($languages[$langcode = $_GET[$param]])) {
+    return $langcode;
+  }
+
+  return FALSE;
+}
